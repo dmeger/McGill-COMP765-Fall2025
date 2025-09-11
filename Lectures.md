@@ -2,7 +2,7 @@
 
 | Date | Topic | Notes and Resources | 
 | --- | --- | --- | 
-| Aug 28 | Introduction | [Intro Notes](Notes/L1-Intro-Robot-Models.md) <br> [Intro Notes on Ed](Notes/L1-COMP765-Fall2025.pdf) <br> [Dynamics Handbook](https://users.dimi.uniud.it/~antonio.dangelo/Robotica/2018/helper/Handbook-dynamics.pdf) | 
+| Aug 28 | Introduction | [Intro Notes](Notes/L1-Intro-Robot-Models.md) <br> [Dynamics Handbook](https://users.dimi.uniud.it/~antonio.dangelo/Robotica/2018/helper/Handbook-dynamics.pdf) | 
 | Sept 2 | Estimation | Probabilistic Robotics (PR), Burgard Fox and Thrun, Ch1 and Ch2 |
 | Sept 4 | Particle Filtering | PR Ch 4 |
 | Sept 9 | Kalman Filtering | PR Ch 3 |
