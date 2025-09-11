@@ -7,7 +7,7 @@
 | Sept 4 | Particle Filtering | PR Ch 4 |
 | Sept 9 | Kalman Filtering | PR Ch 3 |
 | Sept 11 | Mapping and SLAM | PR Ch 9, Ch 10 |
-| Sept 16 | Optimal Control | Control Notes (TBD) |
+| Sept 16 | Optimal Control | [Control Notes](Notes/OptimalControl.md) |
 | Sept 18 | Reinforcement Learning Basics | [RL Text](http://www.incompleteideas.net/book/the-book-2nd.html) |
 | Sept 23 | Gaussian Processes | [GP Text](https://gaussianprocess.org/gpml/chapters/RW.pdf) |
 | Sept 25 | Model-based RL | [PILCO](https://arxiv.org/abs/1502.02860) |
