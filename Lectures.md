@@ -1,3 +1,4 @@
+# Lecture List
 
 | Date | Topic | Notes and Resources | 
 | --- | --- | --- | 
