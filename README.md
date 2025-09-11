@@ -7,6 +7,7 @@ Robotics is the study of physical bodies that can perceive and act in the world,
 None formally. We aim to achieve very high-level content where a mountain of prior knowledge will help, but no one is likely to come into the course knowing everything required (including the instructor). We will acquire the skills together to search for material as we need it!
 
 ## Topic List
+Please see the [lecture list](Lectures) for details and resources.
 - Problems
   - Navigation
   - Manipulation
