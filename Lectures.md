@@ -1,6 +1,4 @@
-layout: page
-title: "Lectures"
-permalink: /lectures
+# Lecture Schedule - Fall 2025
 
 | Date | Topic | Notes and Resources | 
 | --- | --- | --- | 
