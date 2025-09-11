@@ -8,24 +8,18 @@ Assuming a large amount of knowledge about our robotic system and its goals, it 
 ## Claim
 The optimal controller for this system is a linear, time-varying matrix: $$u_t^* = -K_tx_t$$ solveable in closed-form. We will verify and demonstrate this fact by simple construction.
 
-## The Start: $Q_{H-1}$ and $K_{H-1}$ 
-Define $Q_t(x_t,u_t)$, named the state-action value function, as the task objective from time $t$ onwards until $H$, that is the $t,t+1,...,H-1,H$ terms in the sum that forms $J$, if we could start the system at state $x_t$ and make control $u_t$ at time $t$. 
+## The Start: $J_{H}, a simple quadratic 
+Our task objective has a special point at the end, when the episode is about to terminate and control can no longer make a difference. We'll write this $J_H = x_H^TQx_H=x_H^TP_Hx_H$. We are (uselessly?) re-defining the constant matrix $Q$ as $P$ to note its role as the coefficient matrix in the final-cost quadratic equation.
 
-Our model knowledge allows us to know both the time $t$ term in the objective: $x_t^TQx_t + u_tRu_t$, and the next state, at time $t+1$, $x_{t+1} = Ax_{t} + Bu_t$. This allows expanding:
+## Backwards in Time: $J_{H-1}$
 
-$$\begin{aligned} Q_t(x_t,u_t) &=& \sum_{t=t}^H{x_t^TQx_t + u_tRu_t}\\
-&=& 
-\end{aligned}$$
-
-Observe that when $t=H$, there's nothing left for the system to do. We model no control happening at the very last time-step since we'll cut off the system and the future state can't matter. So, we can write out a $Q_H=x_H^TQx_H$. It doesn't affect an instantaneous decision at time $H$, but gives us something concrete to work with one time-step before.
-
-Now let's consider the task objective one time-step from the end of the horizon. 
+Let's move one time-step backwards, to $H-1$, where we have one control left to make and must pay a cost for the $H-1$ and $H$ timesteps. We'll start to make progress by writing out this sum explicitly:
 
 $$\begin{aligned} J_{H-1} &=& \sum_{t=H-1}^H{x_t^TQx_t + u_t^Ru_t} \\
 &=& x_{H-1}^TQx_{H-1} + u_tRu + x_{H}^TQx_{H}.
 \end{aligned}$$
 
-These three terms are simple and allow some nice analysis with calculus. First, we can expand $x_H$ using our known linear dynamics, $x_H=Ax_{H-1}+Bu_{H-1}$. This can substitute into the 3rd term above, followed by simple algebraic expansion and factoring:
+These three terms are simple and allow some nice analysis with calculus. First, we can expand $x_H$ using our known linear dynamics, $x_H=Ax_{H-1}+Bu_{H-1}$. This can substitute into the 3rd term above, followed by simple expansion:
 
 $$\begin{aligned} J_{H-1} &=& x_{H-1}^TQx_{H-1} + u_tRu + x_{H}^TQx_{H} \\
 &=& x_{H-1}^TQx_{H-1} + u_tRu + (x_{H-1}+Bu_{H-1})^TQ(Ax_{H-1}+Bu_{H-1}) \\
@@ -38,7 +32,7 @@ $$\begin{aligned}
 \frac{\partial{J}}{\partial{u_{H-1}}} &=&  2Ru_{H-1} + 2B^TQAx_{H-1} + 2B^TQBu_{H-1}. 
 \end{aligned}$$
 
-Which is zero when
+This is zero when
 $$\begin{aligned}
 Ru_{H-1} + B^TQBu_{H-1} &=& -B^TQAx_{H-1} \\
  (R + B^TQB)u_{H-1} &=& -B^TQAx_{H-1}  \\
