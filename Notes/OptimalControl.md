@@ -9,7 +9,7 @@ So far the algorithms in this course have been passive, doing their best to esti
 ### Notation
 We will continue to use the symbol $u_t$ to represent the instantaneous control that our decision making system executes. We'll look for *policies*, $u_t = \pi_\theta(x_{t-1})$, that can make decisions over a full *trajectory*, $\tau = [ x_0, u_1, x_1, u_2, x_2, ... ]$. By selecting a policy's parameters carefully, we can optimize some performance objective, such as the sum of costs or rewards: $J(\tau)$.
 
-# Simple Decisions: idyn and PID
+## Simple Decisions: idyn and PID
 Sometimes, a robot's desired trajectory is clear, such as when it's provided by the user or a higher-level decision making component, as $\tau_{goal}$. It is still not at all simple to have the physical robot actually follow this trajectory perfectly, but at least it's easy to specify the reward and we can use the next state in the goal trajectory to guide our decision making.
 
 If we have access to strong robot model knowledge, we may be able to directly call to the $u = idyn(x,\dot{x})$ function. Pulling $x$ and $\dot{x}$ from the goal trajectory, we can make a simple path follower in this way. There are still questions about integrating this over a finite time-step and how to deal with unavoidable errors, but *Inverse Dynamic Control* would always be a desireable component for decision making when available.
@@ -21,20 +21,20 @@ In cases where such a model is not possible, we can still work off of the differ
 
 The above methods aren't highly computational and give us little room to build and improve algorithms. Most importantly, they don't consider general-form costs/rewards and don't let us plan into the future to see how our decisions now may affect the build-up of rewards to come. Therefore, the idea of Optimal Control is to turn our algorithms loose, which comes next!
 
-# Optimal Control Starting Point: Linear Quadratic Regulators (LQR)
+## Optimal Control Starting Point: Linear Quadratic Regulators (LQR)
 
 Assuming a large amount of knowledge about our robotic system and its goals, it is sensible to think of directly optimizing for the controller that will perform best on a given task over a long horizon. To start, we assume full knowledge of a simple form and parameters for all of the following:
 
 - The system's linear dynamics: $x_t = Ax_{t-1} + Bu_{t-1}$
 - The task's quadratic objective: $J = \sum_{t=0}^H{x_t^TQx_t + u_tRu_t}$
 
-## Claim
+### Claim
 The optimal controller for this system is a linear, time-varying matrix: $$u_t^* = -K_tx_t$$ solveable in closed-form. We will verify and demonstrate this fact by simple construction.
 
-## The Start: $Q_{H}$, a simple quadratic 
+### The Start: $Q_{H}$, a simple quadratic 
 Our task objective has a special point at the end, when the episode is about to terminate and control can no longer make a difference. We'll define $Q_H(x,u) = x_H^TQx_H=x_H^TP_Hx_H$ as the state-action value function, which is the cost to go at time $H$, making action $u$ (which is ignored), so therefore we only have a terminal Q/state cost here. We are (uselessly?) re-defining the constant matrix $Q$ as $P$ to note its role as the coefficient matrix in the final-cost quadratic equation.
 
-## Backwards in Time: $Q_{H-1}$
+### Backwards in Time: $Q_{H-1}$
 
 Let's move one time-step backwards, to $H-1$, where we have one control left to make and must pay a cost for the $H-1$ and $H$ timesteps. We'll start to make progress by writing out this sum explicitly:
 
@@ -73,10 +73,9 @@ $$\begin{aligned} Q_{H-1}(x,u) &=& x_{H-1}^TQx_{H-1} + u_{H-1}Ru_{H-1} + x_{H-1}
 &=& x_{H-1}^TP_{H-1}x_{H-1}.
 \end{aligned}$$
 
-The final line is a simple quadradic cost in $x_{H-1}$, where we simply define $P_{H-1} to be the appropriate coefficient matrix. Finally we can make use of the previously useless seeming statment, which we will now usefully restate: $Q_H(x,u) = x_H^TP_Hx_H$. The form is the same! 
+The final line is a simple quadradic cost in $x_{H-1}$, where we simply define $P_{H-1}$ to be the appropriate coefficient matrix. Finally we can make use of the previously useless seeming statment, which we will now usefully restate: $Q_H(x,u) = x_H^TP_Hx_H$. The form is the same! 
 
 So, consider what will happen when we write out $Q_{H-2}(x,u)$. We're going to stop spamming lists of symbols and apply our left brains here:
-
 - $Q_{H-2}(x,u)$ can be formed of three terms, immediate state, immediate control and next state quadratic. The pattern is identical to the one we completed.
 - We can apply the known linear dynamics to expand the next state, expand, take derivative and set to zero.
 - Our answer will be $u_{H-2}^* = -K_{H-2}x_{H-2}$. 
@@ -89,7 +88,7 @@ J_t &=& x_t^TP_tx_t \\
 u_t^* &=& -K_tx_t.
 \end{aligned}$$
 
-Our claim is supported!S
+Our claim is supported!
 
 ## Non-linear dynamics, General-form costs and Constraints
 
@@ -103,6 +102,8 @@ Therefore, several components and considerations are common:
 - How to handle constraints and incorporate them into state trajectories and satisficing controls. Includes concepts such as Lagrange multipliers, dual and slack methods.
 
 We will not dive further into the very large and active area of designing and implementing non-linear optimal control solutions in this introductory portion of the course. As we move to advanced topics, we'll see that today, Deep RL approaches have the potential to be used on the problem, especially when model knowledge is missing or unreliable. However, when we do know aspects of the model well, even a large network with lots of data can be assisted by warm-starting or other guidance from model guidance in some form. More on this to come!
+
+## Exercizes
 
 (Ex 2.1) Consider a rocket-powered hockey puck sliding back and forth on 1D ice. The state contains $x$ and $\dot{x}$ and control is a direct acceleration $u=\ddot{x}$. 
 
