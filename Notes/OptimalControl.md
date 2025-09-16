@@ -14,7 +14,7 @@ Sometimes, a robot's desired trajectory is clear, such as when it's provided by 
 
 If we have access to strong robot model knowledge, we may be able to directly call to the $u = idyn(x,\dot{x})$ function. Pulling $x$ and $\dot{x}$ from the goal trajectory, we can make a simple path follower in this way. There are still questions about integrating this over a finite time-step and how to deal with unavoidable errors, but *Inverse Dynamic Control* would always be a desireable component for decision making when available.
 
-In cases where such a model is not possible, we can still work off of the difference $e = x_t - x_{goal}$, and try to drive the system in the correct direction. *Proportional, Integral, Derivative (PID) Control* is perhaps the most famous solution: $u = K_p*e + K_i*\int_{t-H}^te+K_d*\partial{e}/\partial{t}$. The key to PID Control is tuning the three gains, with the following rules of thumb:
+In cases where such a model is not possible, we can still work off of the difference $e = x_t - x_{goal}$, and try to drive the system in the correct direction. *Proportional, Integral, Derivative (PID) Control* is perhaps the most famous solution: $u = K_pe + K_i\int_{t-H}^te+K_d\partial{e}/\partial{t}$. The key to PID Control is tuning the three gains, with the following rules of thumb:
 - K_p makes the system respond faster to errors and has to scale positioning error into the command space.
 - K_i is applied to reduce steady-state errors, such as the constant error one might expect when firing a thruster to counter-act gravity.
 - K_d is a tool to reduce oscillation.
@@ -69,11 +69,11 @@ We can plug the new form for $u$ into our expression for $Q_{H-1}$.
 
 $$\begin{aligned} Q_{H-1}(x,u) &=& x_{H-1}^TQx_{H-1} + u_{H-1}Ru_{H-1} + x_{H-1}^TA^TQAx_{H-1} + 2u_{H-1}^TB^TQAx_{H-1} + u_{H-1}^TB^TQBu_{H-1} \\
 &=& x_{H-1}^TQx_{H-1} + x_{H-1}^TK^TRKx_{H-1} + x_{H-1}^TA^TQAx_{H-1} - 2x_{H-1}K^TB^TQAx_{H-1} + x_{H-1}K^TB^TQBKx_{H-1} \\
-&=& x_{H-1}^T( Q+K^TRK + A^TQA-2K^TB^TQA + K^TB^TQBK )x_{H-1} \\
+&=& x_{H-1}^T( Q + K^TRK + A^TQA-2K^TB^TQA + K^TB^TQBK )x_{H-1} \\
 &=& x_{H-1}^TP_{H-1}x_{H-1}.
 \end{aligned}$$
 
-The final line is a simple quadradic cost in $x_{H-1}$, where we simply define $P_{H-1}$ to be the appropriate coefficient matrix. Finally we can make use of the previously useless seeming statment, which we will now usefully restate: $Q_H(x,u) = x_H^TP_Hx_H$. The form is the same! 
+The final line is a simple quadradic cost in $x_{H-1}$, where we  define $P_{H-1}$ to be the appropriate coefficient matrix. Finally we can make use of the previously useless seeming statment, which we will now usefully restate: $Q_H(x,u) = x_H^TP_Hx_H$. The form is the same! 
 
 So, consider what will happen when we write out $Q_{H-2}(x,u)$. We're going to stop spamming lists of symbols and apply our left brains here:
 - $Q_{H-2}(x,u)$ can be formed of three terms, immediate state, immediate control and next state quadratic. The pattern is identical to the one we completed.
