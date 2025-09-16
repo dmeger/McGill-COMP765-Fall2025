@@ -1,3 +1,5 @@
+# McGill COMP 765 Fall 2025 - Intelligent Robotics
+
 ## Overview 
 Robotics is the study of physical bodies that can perceive and act in the world, and for computer scientists, the focus is on the algorithms, data structures, models and math that makes a robot intelligent. Even with modern hardware, the real world can easily overwhelm a poor algorithm, so often efficient and scalable use of computation equals intelligence.
 
