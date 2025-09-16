@@ -14,7 +14,7 @@ Sometimes, a robot's desired trajectory is clear, such as when it's provided by 
 
 If we have access to strong robot model knowledge, we may be able to directly call to the $u = idyn(x,\dot{x})$ function. Pulling $x$ and $\dot{x}$ from the goal trajectory, we can make a simple path follower in this way. There are still questions about integrating this over a finite time-step and how to deal with unavoidable errors, but *Inverse Dynamic Control* would always be a desireable component for decision making when available.
 
-In cases where such a model is not possible, we can still work off of the difference $e = x_t - x_{goal}$, and try to drive the system in the correct direction. *Proportional, Integral, Derivative (PID) Control* is perhaps the most famous solution: $u = K_pe + K_i\int_{t-H}^te+K_d\partial{e}/\partial{t}$. The key to PID Control is tuning the three gains, with the following rules of thumb:
+In cases where such a model is not possible, we can still work off of the difference $e = x_t - x_{goal}$, and try to drive the system in the correct direction. *Proportional, Integral, Derivative (PID) Control* is perhaps the most famous solution: $u = K_pe + K_i \int_{t-H}^t e + K_d\partial{e}/\partial{t}$. The key to PID Control is tuning the three gains, with the following rules of thumb:
 - K_p makes the system respond faster to errors and has to scale positioning error into the command space.
 - K_i is applied to reduce steady-state errors, such as the constant error one might expect when firing a thruster to counter-act gravity.
 - K_d is a tool to reduce oscillation.
