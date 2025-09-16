@@ -1,6 +1,29 @@
-# Starting Point: Linear Quadratic Regulators (LQR)
+# Robotic Decision Making: Control, Planning and friends
 
-Assuming a large amount of knowledge about our robotic system and its goals, it is sensible to think of directly optimizing for the controller that will perform best on a given task. To start, we assume full knowledge of a simple form and parameters for all of the following:
+So far the algorithms in this course have been passive, doing their best to estimate the nature of the world from incoming data without making choices about what to do next. We must change this to fully embrace the goal of robotics. Our upcoming objectives will include:
+- Simple formulas for making instantaneous decisions when things go well enough.
+- Formulations that enable longer-term decision making, over a fixed horizon or forever into the future.
+- Computational methods to act optimally when the system's models are known and to pair learning important parts of those models with behavior optimization, in the case we didn't start with model knowledge.
+- Awareness of how uncertainty affects our decisions, and in some cases how we need to put thought directly into addressing (minimizing/resolving) uncertainty.
+
+### Notation
+We will continue to use the symbol $u_t$ to represent the instantaneous control that our decision making system executes. We'll look for *policies*, $u_t = \pi_\theta(x_{t-1})$, that can make decisions over a full *trajectory*, $\tau = [ x_0, u_1, x_1, u_2, x_2, ... ]$. By selecting a policy's parameters carefully, we can optimize some performance objective, such as the sum of costs or rewards: $J(\tau)$.
+
+# Simple Decisions: idyn and PID
+Sometimes, a robot's desired trajectory is clear, such as when it's provided by the user or a higher-level decision making component, as $\tau_{goal}$. It is still not at all simple to have the physical robot actually follow this trajectory perfectly, but at least it's easy to specify the reward and we can use the next state in the goal trajectory to guide our decision making.
+
+If we have access to strong robot model knowledge, we may be able to directly call to the $u = idyn(x,\dot{x})$ function. Pulling $x$ and $\dot{x}$ from the goal trajectory, we can make a simple path follower in this way. There are still questions about integrating this over a finite time-step and how to deal with unavoidable errors, but *Inverse Dynamic Control* would always be a desireable component for decision making when available.
+
+In cases where such a model is not possible, we can still work off of the difference $e = x_t - x_{goal}$, and try to drive the system in the correct direction. *Proportional, Integral, Derivative (PID) Control* is perhaps the most famous solution: $u = K_p*e + K_i*\int_{t-H}^te+K_d*\partial{e}/\partial{t}$. The key to PID Control is tuning the three gains, with the following rules of thumb:
+- K_p makes the system respond faster to errors and has to scale positioning error into the command space.
+- K_i is applied to reduce steady-state errors, such as the constant error one might expect when firing a thruster to counter-act gravity.
+- K_d is a tool to reduce oscillation.
+
+The above methods aren't highly computational and give us little room to build and improve algorithms. Most importantly, they don't consider general-form costs/rewards and don't let us plan into the future to see how our decisions now may affect the build-up of rewards to come. Therefore, the idea of Optimal Control is to turn our algorithms loose, which comes next!
+
+# Optimal Control Starting Point: Linear Quadratic Regulators (LQR)
+
+Assuming a large amount of knowledge about our robotic system and its goals, it is sensible to think of directly optimizing for the controller that will perform best on a given task over a long horizon. To start, we assume full knowledge of a simple form and parameters for all of the following:
 
 - The system's linear dynamics: $x_t = Ax_{t-1} + Bu_{t-1}$
 - The task's quadratic objective: $J = \sum_{t=0}^H{x_t^TQx_t + u_tRu_t}$
@@ -8,22 +31,22 @@ Assuming a large amount of knowledge about our robotic system and its goals, it 
 ## Claim
 The optimal controller for this system is a linear, time-varying matrix: $$u_t^* = -K_tx_t$$ solveable in closed-form. We will verify and demonstrate this fact by simple construction.
 
-## The Start: $J_{H}, a simple quadratic 
-Our task objective has a special point at the end, when the episode is about to terminate and control can no longer make a difference. We'll write this $J_H = x_H^TQx_H=x_H^TP_Hx_H$. We are (uselessly?) re-defining the constant matrix $Q$ as $P$ to note its role as the coefficient matrix in the final-cost quadratic equation.
+## The Start: $Q_{H}, a simple quadratic 
+Our task objective has a special point at the end, when the episode is about to terminate and control can no longer make a difference. We'll define $Q_H(x,u) = x_H^TQx_H=x_H^TP_Hx_H$ as the state-action value function, which is the cost to go at time $H$, making action $u$ (which is ignored), so therefore we only have a terminal Q/state cost here. We are (uselessly?) re-defining the constant matrix $Q$ as $P$ to note its role as the coefficient matrix in the final-cost quadratic equation.
 
-## Backwards in Time: $J_{H-1}$
+## Backwards in Time: $Q_{H-1}$
 
 Let's move one time-step backwards, to $H-1$, where we have one control left to make and must pay a cost for the $H-1$ and $H$ timesteps. We'll start to make progress by writing out this sum explicitly:
 
-$$\begin{aligned} J_{H-1} &=& \sum_{t=H-1}^H{x_t^TQx_t + u_t^Ru_t} \\
-&=& x_{H-1}^TQx_{H-1} + u_tRu + x_{H}^TQx_{H}.
+$$\begin{aligned} Q_{H-1}(x,u) &=& x_{H-1}^TQx_{H-1} + u_{H-1}^TRu_{H-1} + Q_H(x_H,u_H)\\
+&=& x_{H-1}^TQx_{H-1} + u_{H-1}^TRu_{H-1} + x_{H}^TQx_{H}.
 \end{aligned}$$
 
 These three terms are simple and allow some nice analysis with calculus. First, we can expand $x_H$ using our known linear dynamics, $x_H=Ax_{H-1}+Bu_{H-1}$. This can substitute into the 3rd term above, followed by simple expansion:
 
-$$\begin{aligned} J_{H-1} &=& x_{H-1}^TQx_{H-1} + u_tRu + x_{H}^TQx_{H} \\
-&=& x_{H-1}^TQx_{H-1} + u_tRu + (x_{H-1}+Bu_{H-1})^TQ(Ax_{H-1}+Bu_{H-1}) \\
-&=& x_{H-1}^TQx_{H-1} + u_{H-1}Ru_{H-1} + x_{H-1}^TA^TQAx_{H-1} + 2u_{H-1}^TB^TQAx_{H-1} + u_{H-1}^TB^TQBu_{H-1}. 
+$$\begin{aligned} Q_{H-1} &=& x_{H-1}^TQx_{H-1} + u_{H-1}^TRu_{H-1} + x_{H}^TQx_{H} \\
+&=& x_{H-1}^TQx_{H-1} + u_{H-1}^TRu_{H-1} + (Ax_{H-1}+Bu_{H-1})^TQ(Ax_{H-1}+Bu_{H-1}) \\
+&=& x_{H-1}^TQx_{H-1} + u_{H-1}^TRu_{H-1} + x_{H-1}^TA^TQAx_{H-1} + 2u_{H-1}^TB^TQAx_{H-1} + u_{H-1}^TB^TQBu_{H-1}. 
 \end{aligned}$$
 
 This mess can be made manageable by noticing we only care about finding $u^*$. The mess is at least obviously quadratic in $u$, with positive-definite coefficient matrices. It's minimum occurs where $\frac{\partial{J}}{\partial{u_{H-1}}}=0$. We continue... 
@@ -32,7 +55,7 @@ $$\begin{aligned}
 \frac{\partial{J}}{\partial{u_{H-1}}} &=&  2Ru_{H-1} + 2B^TQAx_{H-1} + 2B^TQBu_{H-1}. 
 \end{aligned}$$
 
-This is zero when
+This is zero when (grouping terms with $u_{H-1}$ on LHS):
 $$\begin{aligned}
 Ru_{H-1} + B^TQBu_{H-1} &=& -B^TQAx_{H-1} \\
  (R + B^TQB)u_{H-1} &=& -B^TQAx_{H-1}  \\
@@ -42,18 +65,19 @@ u_{H-1}^* &=& -K_{H-1}x_{H-1}.
 
 We have accomplished the form of our claim for one very special time-step! It's time to tidy things up and get ready to attempt the solution for all $H-2$ previous time-steps.
 
-We can plug the new form for $u$ into our expression for $J_{H-1}$. 
+We can plug the new form for $u$ into our expression for $Q_{H-1}$. 
 
-$$\begin{aligned} J_{H-1} &=& x_{H-1}^TQx_{H-1} + u_{H-1}Ru_{H-1} + x_{H-1}^TA^TQAx_{H-1} + 2u_{H-1}^TB^TQAx_{H-1} + u_{H-1}^TB^TQBu_{H-1} \\
+$$\begin{aligned} Q_{H-1}(x,u) &=& x_{H-1}^TQx_{H-1} + u_{H-1}Ru_{H-1} + x_{H-1}^TA^TQAx_{H-1} + 2u_{H-1}^TB^TQAx_{H-1} + u_{H-1}^TB^TQBu_{H-1} \\
 &=& x_{H-1}^TQx_{H-1} + x_{H-1}^TK^TRKx_{H-1} + x_{H-1}^TA^TQAx_{H-1} - 2x_{H-1}K^TB^TQAx_{H-1} + x_{H-1}K^TB^TQBKx_{H-1} \\
-&=& x_{H-1}^T( Q+K^TRK + A^TQA-2K^TB^TQA + K^TB^TQBK )x_{H-1}.
+&=& x_{H-1}^T( Q+K^TRK + A^TQA-2K^TB^TQA + K^TB^TQBK )x_{H-1} \\
+&=& x_{H-1}^TP_{H-1}x_{H-1}.
 \end{aligned}$$
 
-The final line is a simple quadradic cost in $x_{H-1}$, which we can express as $x_{H-1}^TP_{H-1}x_{H-1}$. Finally we can make use of the previously useless seeming statment, which we will now usefully restate: $J_H = x_H^TP_Hx_H$. The form is the same! 
+The final line is a simple quadradic cost in $x_{H-1}$, where we simply define $P_{H-1} to be the appropriate coefficient matrix. Finally we can make use of the previously useless seeming statment, which we will now usefully restate: $Q_H(x,u) = x_H^TP_Hx_H$. The form is the same! 
 
-So, consider what will happen when we write out J_{H-2}. We're going to stop spamming lists of symbols and apply our left brains here:
+So, consider what will happen when we write out $Q_{H-2}(x,u)$. We're going to stop spamming lists of symbols and apply our left brains here:
 
-- J_{H-2} can be formed of three terms, immediate state, immediate control and next state quadratic. The pattern is identical to the one we completed.
+- $Q_{H-2}(x,u)$ can be formed of three terms, immediate state, immediate control and next state quadratic. The pattern is identical to the one we completed.
 - We can apply the known linear dynamics to expand the next state, expand, take derivative and set to zero.
 - Our answer will be $u_{H-2}^* = -K_{H-2}x_{H-2}$. 
 - We can plug back in to the expanded form of $J_{H-2}$ and factor again to a new quadratic, $x_{H-2}^TP_{H-2}x_{H-2}$.
@@ -65,7 +89,7 @@ J_t &=& x_t^TP_tx_t \\
 u_t^* &=& -K_tx_t.
 \end{aligned}$$
 
-Our claim is supported!
+Our claim is supported!S
 
 ## Non-linear dynamics, General-form costs and Constraints
 
