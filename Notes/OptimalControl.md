@@ -31,7 +31,7 @@ Assuming a large amount of knowledge about our robotic system and its goals, it 
 ## Claim
 The optimal controller for this system is a linear, time-varying matrix: $$u_t^* = -K_tx_t$$ solveable in closed-form. We will verify and demonstrate this fact by simple construction.
 
-## The Start: $Q_{H}, a simple quadratic 
+## The Start: $Q_{H}$, a simple quadratic 
 Our task objective has a special point at the end, when the episode is about to terminate and control can no longer make a difference. We'll define $Q_H(x,u) = x_H^TQx_H=x_H^TP_Hx_H$ as the state-action value function, which is the cost to go at time $H$, making action $u$ (which is ignored), so therefore we only have a terminal Q/state cost here. We are (uselessly?) re-defining the constant matrix $Q$ as $P$ to note its role as the coefficient matrix in the final-cost quadratic equation.
 
 ## Backwards in Time: $Q_{H-1}$
