@@ -8,11 +8,11 @@
 | Sept 9 | Kalman Filtering | PR Ch 3 |
 | Sept 11 | Mapping and SLAM | PR Ch 9, Ch 10 |
 | Sept 16 | Optimal Control | [Control Notes](Notes/OptimalControl.md) |
-| Sept 18 | Reinforcement Learning Basics | [RL Text](http://www.incompleteideas.net/book/the-book-2nd.html) |
-| Sept 23 | Gaussian Processes | [GP Text](https://gaussianprocess.org/gpml/chapters/RW.pdf) |
-| Sept 25 | Model-based RL | [PILCO](https://arxiv.org/abs/1502.02860) |
+| Sept 18 | Reinforcement Learning Basics | <a href="http://www.incompleteideas.net/book/the-book-2nd.html" target="_blank">RL Text</a> |
+| Sept 23 | Gaussian Processes | <a href="https://gaussianprocess.org/gpml/chapters/RW.pdf" target="_blank">GP Text</a> |
+| Sept 25 | Model-based RL | <a href="https://arxiv.org/abs/1502.02860" target="_blank">PILCO</a> |
 | Sept 30 | Imitation Learning | IL Notes (TBD) |
-| Oct 7 | Inverse Reinfocement Learning | IRL Notes (TBD) <br> [Max-Ent IRL](https://cdn.aaai.org/AAAI/2008/AAAI08-227.pdf)|
+| Oct 7 | Inverse Reinfocement Learning | IRL Notes (TBD) <br> <a href="https://cdn.aaai.org/AAAI/2008/AAAI08-227.pdf" target="_blank">Max-Ent IRL</a> |
 | Oct 9 | Midterm In Class | Practice Exam TBD |
 | Oct 14 and 16 | Reading Week - No classes | |
 | Oct 21 | Advanced Topics and Student Presentations from here (TBD) | |
